@@ -5,9 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Mario HTML5 Clone</title>
     <style>
-        body { margin: 0; padding: 0; background: #222; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: Arial, sans-serif; }
-        canvas { background: #6b8cff; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        #info { position: absolute; top: 10px; color: white; font-size: 18px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 5px; }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            background: #6b8cff; /* لون سماء ماريو */
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            color: white;
+            font-size: 18px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -19,111 +40,163 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// 1. تحميل الصورة مرة واحدة فقط خارج الحلقة
+// 1. تحميل صورة الشخصية الخاصة بك مرة واحدة خارج الحلقة لضمان الوضوح
 const playerImage = new Image();
 playerImage.src = 'https://raw.githubusercontent.com/eliasaj5312/uper-Razzouqa/main/f6ad2363-1161-4b8e-b8ad-b7de753e6635.png';
 
 let currentLevelIdx = 0;
 let cameraX = 0;
 
+// تصميم المراحل (B: أرضية، C: صندوق مفاجآت، E: علم النهاية، P: اللاعب)
 const LEVELS = [
     [
-        "                                ",
-        "                                ",
-        "                                ",
-        "          C   C                 ",
-        "                                ",
-        "      B            B           E",
-        "P  BBBB        BBBBB    BBBB   BBBBBBBBBBBBBBBBBBBBBB",
+        "                                                      ",
+        "                                                      ",
+        "                                                      ",
+        "         C   C                                        ",
+        "                                                      ",
+        "     B            B                                  E",
+        "P  BBBB        BBBBB    BBBB    BBBBBBBBBBBBBBBBBBBBBB",
         "BBBBBBBBBB  BBBBBBBBBBBBBBBB  BBBBBBBBBBBBBBBBBBBBBB"
     ]
 ];
 
 class Player {
     constructor(x, y) {
-        this.x = x; this.y = y;
-        this.width = 40; this.height = 60;
-        this.velX = 0; this.velY = 0;
-        this.jumpPower = -10;
-        this.gravity = 0.4; 
+        this.x = x;
+        this.y = y;
+        // تكبير حجم الشخصية لتصبح واضحة داخل اللعبة
+        this.width = 55; 
+        this.height = 75; 
+        this.velX = 0;
+        this.velY = 0;
+        // ضبط قوة القفز لتكون ممتازة
+        this.jumpPower = -14; 
+        // ضبط الجاذبية لتكون ناعمة وموزونة
+        this.gravity = 0.55; 
         this.onGround = false;
     }
+
     update(platforms) {
         this.velY += this.gravity;
+        
+        // حركة أفقية
         this.x += this.velX;
         this.collide(platforms, 'x');
+        
+        // حركة عمودية
         this.y += this.velY;
         this.onGround = false;
         this.collide(platforms, 'y');
     }
+
     collide(platforms, direction) {
         for (let p of platforms) {
             if (this.x < p.x + p.width && this.x + this.width > p.x &&
                 this.y < p.y + p.height && this.y + this.height > p.y) {
+                
                 if (direction === 'x') {
                     if (this.velX > 0) this.x = p.x - this.width;
                     if (this.velX < 0) this.x = p.x + p.width;
                 } else if (direction === 'y') {
-                    if (this.velY > 0) { this.y = p.y - this.height; this.velY = 0; this.onGround = true; }
-                    if (this.velY < 0) { this.y = p.y + p.height; this.velY = 0; }
+                    if (this.velY > 0) {
+                        this.y = p.y - this.height;
+                        this.velY = 0;
+                        this.onGround = true;
+                    }
+                    if (this.velY < 0) {
+                        this.y = p.y + p.height;
+                        this.velY = 0;
+                    }
                 }
             }
         }
     }
-    jump() { if (this.onGround) this.velY = this.jumpPower; }
+
+    jump() {
+        if (this.onGround) {
+            this.velY = this.jumpPower;
+        }
+    }
 }
 
 class Platform {
-    constructor(x, y, w, h, type) { this.x = x; this.y = y; this.width = w; this.height = h; this.type = type; }
+    constructor(x, y, w, h, type) {
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+        this.type = type;
+    }
+
     draw() {
-        if (this.type === 'B') ctx.fillStyle = "#8B4513";
-        else if (this.type === 'C') ctx.fillStyle = "#FFD700";
-        else if (this.type === 'E') ctx.fillStyle = "#00FF00";
+        if (this.type === 'B') ctx.fillStyle = "#8B4513"; // بني للأرض
+        else if (this.type === 'C') ctx.fillStyle = "#FFD700"; // أصفر للصناديق
+        else if (this.type === 'E') ctx.fillStyle = "#00FF00"; // أخضر للنهاية
+        
         ctx.fillRect(this.x - cameraX, this.y, this.width, this.height);
     }
 }
 
-let player, platforms = [], endGate = null;
+let player;
+let platforms = [];
+let endGate = null;
 
 function loadLevel(idx) {
     platforms = [];
+    document.getElementById("level-num").innerText = idx + 1;
     const levelData = LEVELS[idx];
     const tileSize = 60;
+
     for (let row = 0; row < levelData.length; row++) {
         for (let col = 0; col < levelData[row].length; col++) {
             let char = levelData[row][col];
-            if (char === 'B' || char === 'C') platforms.push(new Platform(col * tileSize, row * tileSize + 150, tileSize, tileSize, char));
-            else if (char === 'E') endGate = new Platform(col * tileSize, row * tileSize + 150, tileSize, tileSize * 2, 'E');
-            else if (char === 'P') player = new Player(col * tileSize, row * tileSize + 150);
+            let x = col * tileSize;
+            let y = row * tileSize + 150;
+
+            if (char === 'B' || char === 'C') {
+                platforms.push(new Platform(x, y, tileSize, tileSize, char));
+            } else if (char === 'E') {
+                endGate = new Platform(x, y, tileSize, tileSize * 2, 'E');
+            } else if (char === 'P') {
+                player = new Player(x, y);
+            }
         }
     }
     cameraX = 0;
 }
 
+// التحكم عبر الكيبورد
 const keys = {};
-window.addEventListener("keydown", e => { keys[e.code] = true; if (e.code === "Space" || e.code === "ArrowUp") player.jump(); });
+window.addEventListener("keydown", e => {
+    keys[e.code] = true;
+    if (e.code === "Space" || e.code === "ArrowUp") player.jump();
+});
 window.addEventListener("keyup", e => keys[e.code] = false);
 
 function gameLoop() {
+    // تحديث حركة اللاعب
     player.velX = 0;
-    if (keys["ArrowRight"] || keys["KeyD"]) player.velX = 3;
-    if (keys["ArrowLeft"] || keys["KeyA"]) player.velX = -3;
+    if (keys["ArrowRight"] || keys["KeyD"]) player.velX = 4;
+    if (keys["ArrowLeft"] || keys["KeyA"]) player.velX = -4;
+
     player.update(platforms);
 
-    if (player.x - cameraX > canvas.width / 2) cameraX = player.x - canvas.width / 2;
+    // تحريك الكاميرا مع اللاعب
+    if (player.x - cameraX > canvas.width / 2) {
+        cameraX = player.x - canvas.width / 2;
+    }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    platforms.forEach(p => p.draw());
-    if (endGate) endGate.draw();
+    // التحقق من الفوز بالمرحلة
+    if (endGate && player.x < endGate.x + endGate.width && player.x + player.width > endGate.x &&
+        player.y < endGate.y + endGate.height && player.y + player.height > endGate.y) {
+        alert("مبروك! لقد فزت بالمرحلة!");
+        loadLevel(currentLevelIdx);
+    }
 
-    // الرسم النهائي (صورة واحدة فقط)
-    ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
-    
-    requestAnimationFrame(gameLoop);
-}
+    // إصلاح مشكلة السقوط: الموت وإعادة تشغيل المرحلة عند الوقوع في الحفرة
+    if (player.y > canvas.height) {
+        loadLevel(currentLevelIdx);
+    }
 
-loadLevel(0);
-gameLoop();
-</script>
-</body>
-</html>
+    // تنظيف الشاشة ور
