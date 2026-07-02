@@ -80,8 +80,8 @@ class Player {
         this.height = 60;
         this.velX = 0;
         this.velY = 0;
-        this.jumpPower = -15;
-        this.gravity = 0.8;
+        this.jumpPower = -10;
+        this.gravity = 0.4;
         this.onGround = false;
     }
 
@@ -188,8 +188,8 @@ window.addEventListener("keyup", e => keys[e.code] = false);
 function gameLoop() {
     // تحديث حركة اللاعب
     player.velX = 0;
-    if (keys["ArrowRight"] || keys["KeyD"]) player.velX = 6;
-    if (keys["ArrowLeft"] || keys["KeyA"]) player.velX = -6;
+    if (keys["ArrowRight"] || keys["KeyD"]) player.velX = 3;
+    if (keys["ArrowLeft"] || keys["KeyA"]) player.velX = -3;
 
     player.update(platforms);
 
@@ -223,10 +223,14 @@ function gameLoop() {
     platforms.forEach(p => p.draw());
     if (endGate) endGate.draw();
 
-    // رسم اللاعب
-    ctx.fillStyle = playerColor;
-    ctx.fillRect(player.x - cameraX, player.y, player.width, player.height);
-
+ // تحميل ورسم الصورة بدلاً من المربع
+const playerImage = new Image();
+playerImage.src = 'f6ad2363-1161-4b8e-b8ad-b7de753e6635.png'; 
+ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
+    
+// 2. رسم الشخصية بدلاً من المربع الملون
+// هذا الجزء يذهب داخل gameLoop()، تحت جزء التحديث (Update)
+ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
     requestAnimationFrame(gameLoop);
 }
 
