@@ -40,7 +40,7 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// 1. تحميل صورة الشخصية الخاصة بك مرة واحدة خارج الحلقة لضمان الوضوح
+// 1. تحميل صورة الشخصية الخاصة بك
 const playerImage = new Image();
 playerImage.src = 'https://raw.githubusercontent.com/eliasaj5312/uper-Razzouqa/main/f6ad2363-1161-4b8e-b8ad-b7de753e6635.png';
 
@@ -48,16 +48,19 @@ let currentLevelIdx = 0;
 let cameraX = 0;
 
 // تصميم المراحل (B: أرضية، C: صندوق مفاجآت، E: علم النهاية، P: اللاعب)
+// تم ضبط الأبعاد هنا بدقة لكي تظهر الأرضية فوراً على الشاشة دون فراغات ضخمة
 const LEVELS = [
     [
-        "                                                      ",
-        "                                                      ",
-        "                                                      ",
-        "         C   C                                        ",
-        "                                                      ",
-        "     B            B                                  E",
-        "P  BBBB        BBBBB    BBBB    BBBBBBBBBBBBBBBBBBBBBB",
-        "BBBBBBBBBB  BBBBBBBBBBBBBBBB  BBBBBBBBBBBBBBBBBBBBBB"
+        "                                                                ",
+        "                                                                ",
+        "                                                                ",
+        "                                                                ",
+        "                                                                ",
+        "         C   C                                                  ",
+        "                                                                ",
+        "     B            B                                            E",
+        "P  BBBB        BBBBB    BBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "BBBBBBBBBB  BBBBBBBBBBBBBBBB  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
     ]
 ];
 
@@ -65,15 +68,15 @@ class Player {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        // تكبير حجم الشخصية لتصبح واضحة داخل اللعبة
-        this.width = 55; 
-        this.height = 75; 
+        // حجم مناسب جداً للشخصية لتكون واضحة
+        this.width = 60; 
+        this.height = 80; 
         this.velX = 0;
         this.velY = 0;
-        // ضبط قوة القفز لتكون ممتازة
+        // قوة قفز ممتازة وسلسة
         this.jumpPower = -14; 
-        // ضبط الجاذبية لتكون ناعمة وموزونة
-        this.gravity = 0.55; 
+        // جاذبية متزنة لمنع الطيران والسقوط السريع
+        this.gravity = 0.6; 
         this.onGround = false;
     }
 
@@ -152,12 +155,13 @@ function loadLevel(idx) {
         for (let col = 0; col < levelData[row].length; col++) {
             let char = levelData[row][col];
             let x = col * tileSize;
-            let y = row * tileSize + 150;
+            // تم ضبط معادلة الارتفاع لتتناسب مع أبعاد الـ Canvas (600px) ولتظهر الأرض في الأسفل
+            let y = row * tileSize; 
 
             if (char === 'B' || char === 'C') {
                 platforms.push(new Platform(x, y, tileSize, tileSize, char));
             } else if (char === 'E') {
-                endGate = new Platform(x, y, tileSize, tileSize * 2, 'E');
+                endGate = new Platform(x, y - tileSize, tileSize, tileSize * 2, 'E');
             } else if (char === 'P') {
                 player = new Player(x, y);
             }
@@ -166,7 +170,7 @@ function loadLevel(idx) {
     cameraX = 0;
 }
 
-// التحكم عبر الكيبورد
+// التحكم
 const keys = {};
 window.addEventListener("keydown", e => {
     keys[e.code] = true;
@@ -175,28 +179,50 @@ window.addEventListener("keydown", e => {
 window.addEventListener("keyup", e => keys[e.code] = false);
 
 function gameLoop() {
-    // تحديث حركة اللاعب
+    // حركة اللاعب
     player.velX = 0;
     if (keys["ArrowRight"] || keys["KeyD"]) player.velX = 4;
     if (keys["ArrowLeft"] || keys["KeyA"]) player.velX = -4;
 
     player.update(platforms);
 
-    // تحريك الكاميرا مع اللاعب
+    // تحريك الكاميرا مع اللاعب عند منتصف الشاشة
     if (player.x - cameraX > canvas.width / 2) {
         cameraX = player.x - canvas.width / 2;
     }
+    if (player.x - cameraX < canvas.width / 4 && cameraX > 0) {
+        cameraX = player.x - canvas.width / 4;
+    }
 
-    // التحقق من الفوز بالمرحلة
+    // الفوز بالمرحلة
     if (endGate && player.x < endGate.x + endGate.width && player.x + player.width > endGate.x &&
         player.y < endGate.y + endGate.height && player.y + player.height > endGate.y) {
         alert("مبروك! لقد فزت بالمرحلة!");
         loadLevel(currentLevelIdx);
     }
 
-    // إصلاح مشكلة السقوط: الموت وإعادة تشغيل المرحلة عند الوقوع في الحفرة
+    // السقوط في الحفرة = إعادة تشغيل المرحلة فوراً
     if (player.y > canvas.height) {
         loadLevel(currentLevelIdx);
     }
 
-    // تنظيف الشاشة ور
+    // مسح ورسم الإطارات الجديدة
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // رسم الأرض والمربعات والعلم
+    platforms.forEach(p => p.draw());
+    if (endGate) endGate.draw();
+
+    // رسم صورة الشخصية الخاصة بك
+    ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
+    
+    requestAnimationFrame(gameLoop);
+}
+
+// تشغيل اللعبة
+loadLevel(currentLevelIdx);
+gameLoop();
+</script>
+
+</body>
+</html>
