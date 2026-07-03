@@ -3,226 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Mario HTML5 Clone</title>
+    <title>سوبر رزوقه - HTML5</title>
     <style>
+        /* --- تنسيق الصفحة --- */
         body {
             margin: 0;
             padding: 0;
-            background: #222;
+            background: #1a1a2e;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            user-select: none;
         }
+
+        /* --- حاوية اللعبة --- */
+        #gameContainer {
+            position: relative;
+            border-radius: 16px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 80px rgba(92, 148, 252, 0.15);
+            overflow: hidden;
+        }
+
         canvas {
-            background: #6b8cff; /* لون سماء ماريو */
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: block;
+            background: #5c94fc;
+            width: 900px;
+            height: 600px;
         }
+
+        /* --- شريط المعلومات --- */
         #info {
             position: absolute;
-            top: 10px;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
             color: white;
             font-size: 18px;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 5px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 6px 24px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 5;
+            white-space: nowrap;
+        }
+        #info span {
+            color: #ffd700;
+        }
+
+        /* --- قائمة البداية --- */
+        #startMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at 30% 30%, #5c94fc, #1a3b7a);
+            box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.4);
+            color: white;
+            text-align: center;
+            z-index: 20;
+            border-radius: 16px;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #startMenu.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        #startMenu h1 {
+            font-size: 64px;
+            margin: 0 0 8px 0;
+            color: #ffcc00;
+            text-shadow: 4px 4px 0 #7a4a12, -2px -2px 0 #7a4a12, 2px -2px 0 #7a4a12, -2px 2px 0 #7a4a12;
+            letter-spacing: 4px;
+            font-weight: 900;
+        }
+
+        #startMenu .subtitle {
+            font-size: 22px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 30px;
+            border-radius: 40px;
+            margin: 0 0 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #startMenu .controls {
+            font-size: 16px;
+            color: #d0e0ff;
+            margin: 12px 0 30px 0;
+            line-height: 1.8;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 24px;
+            border-radius: 12px;
+        }
+        #startMenu .controls kbd {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-family: inherit;
+            color: #ffd700;
+        }
+
+        #startButton {
+            font-family: inherit;
+            font-size: 26px;
+            font-weight: bold;
+            color: #fff;
+            background: #e8302a;
+            border: none;
+            border-radius: 16px;
+            padding: 16px 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #7a1a17, 0 8px 20px rgba(232, 48, 42, 0.4);
+            transition: transform 0.08s ease, box-shadow 0.15s ease;
+            letter-spacing: 1px;
+        }
+        #startButton:hover {
+            background: #ff3b35;
+            transform: scale(1.03);
+        }
+        #startButton:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #7a1a17;
+        }
+
+        @media (max-width: 920px) {
+            canvas {
+                width: 100vw;
+                height: auto;
+                aspect-ratio: 900 / 600;
+            }
+            #info {
+                font-size: 13px;
+                padding: 4px 12px;
+                top: 10px;
+                white-space: normal;
+            }
+            #startMenu h1 {
+                font-size: 36px;
+            }
+            #startMenu .subtitle {
+                font-size: 16px;
+            }
+            #startMenu .controls {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+            #startButton {
+                font-size: 18px;
+                padding: 12px 30px;
+            }
         }
     </style>
 </head>
 <body>
 
-<div id="info">المرحلة: <span id="level-num">1</span> | الأسهم للحركة والقفز</div>
-<canvas id="gameCanvas" width="800" height="600"></canvas>
+<div id="gameContainer">
+    <canvas id="gameCanvas" width="900" height="600"></canvas>
+
+    <div id="info">⭐ المرحلة: <span id="level-num">1</span> &nbsp;|&nbsp; 🎮 <kbd>←/→</kbd> للحركة &nbsp; <kbd>Space/↑</kbd> للقفز &nbsp; <kbd>X</kbd> للضربة</div>
+
+    <div id="startMenu">
+        <h1>🍄 سوبر رزوقه</h1>
+        <div class="subtitle">⚡ المغامرة تبدأ الآن ⚡</div>
+        <div class="controls">
+            <kbd>←</kbd> <kbd>→</kbd> أو <kbd>A</kbd> <kbd>D</kbd> للحركة &nbsp;|&nbsp;
+            <kbd>Space</kbd> أو <kbd>↑</kbd> للقفز &nbsp;|&nbsp;
+            <kbd>X</kbd> للضربة<br>
+            <span style="color:#ffb3b3;">⚠️ اقفز فوق الأعداء أو اضربهم بـ <kbd>X</kbd> — احذر الشوكي!</span>
+        </div>
+        <button id="startButton">▶ ابدأ اللعبة</button>
+    </div>
+</div>
 
 <script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+    // ============================================================
+    //  إعدادات اللوحة والسياق
+    // ============================================================
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
-// 1. تحميل صورة الشخصية الخاصة بك
-const playerImage = new Image();
-playerImage.src = 'https://raw.githubusercontent.com/eliasaj5312/uper-Razzouqa/main/f6ad2363-1161-4b8e-b8ad-b7de753e6635.png';
+    // ============================================================
+    //  تحميل الصور
+    // ============================================================
+    const playerImage = new Image();
+    playerImage.src = 'https://raw.githubusercontent.com/eliasaj5312/uper-Razzouqa/main/f6ad2363-1161-4b8e-b8ad-b7de753e6635.png';
 
-let currentLevelIdx = 0;
-let cameraX = 0;
-
-// تصميم المراحل (B: أرضية، C: صندوق مفاجآت، E: علم النهاية، P: اللاعب)
-// تم ضبط الأبعاد هنا بدقة لكي تظهر الأرضية فوراً على الشاشة دون فراغات ضخمة
-const LEVELS = [
-    [
-        "                                                                ",
-        "                                                                ",
-        "                                                                ",
-        "                                                                ",
-        "                                                                ",
-        "         C   C                                                  ",
-        "                                                                ",
-        "     B            B                                            E",
-        "P  BBBB        BBBBB    BBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        "BBBBBBBBBB  BBBBBBBBBBBBBBBB  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-    ]
-];
-
-class Player {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        // حجم مناسب جداً للشخصية لتكون واضحة
-        this.width = 60; 
-        this.height = 80; 
-        this.velX = 0;
-        this.velY = 0;
-        // قوة قفز ممتازة وسلسة
-        this.jumpPower = -14; 
-        // جاذبية متزنة لمنع الطيران والسقوط السريع
-        this.gravity = 0.6; 
-        this.onGround = false;
-    }
-
-    update(platforms) {
-        this.velY += this.gravity;
-        
-        // حركة أفقية
-        this.x += this.velX;
-        this.collide(platforms, 'x');
-        
-        // حركة عمودية
-        this.y += this.velY;
-        this.onGround = false;
-        this.collide(platforms, 'y');
-    }
-
-    collide(platforms, direction) {
-        for (let p of platforms) {
-            if (this.x < p.x + p.width && this.x + this.width > p.x &&
-                this.y < p.y + p.height && this.y + this.height > p.y) {
-                
-                if (direction === 'x') {
-                    if (this.velX > 0) this.x = p.x - this.width;
-                    if (this.velX < 0) this.x = p.x + p.width;
-                } else if (direction === 'y') {
-                    if (this.velY > 0) {
-                        this.y = p.y - this.height;
-                        this.velY = 0;
-                        this.onGround = true;
-                    }
-                    if (this.velY < 0) {
-                        this.y = p.y + p.height;
-                        this.velY = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    jump() {
-        if (this.onGround) {
-            this.velY = this.jumpPower;
-        }
-    }
-}
-
-class Platform {
-    constructor(x, y, w, h, type) {
-        this.x = x;
-        this.y = y;
-        this.width = w;
-        this.height = h;
-        this.type = type;
-    }
-
-    draw() {
-        if (this.type === 'B') ctx.fillStyle = "#8B4513"; // بني للأرض
-        else if (this.type === 'C') ctx.fillStyle = "#FFD700"; // أصفر للصناديق
-        else if (this.type === 'E') ctx.fillStyle = "#00FF00"; // أخضر للنهاية
-        
-        ctx.fillRect(this.x - cameraX, this.y, this.width, this.height);
-    }
-}
-
-let player;
-let platforms = [];
-let endGate = null;
-
-function loadLevel(idx) {
-    platforms = [];
-    document.getElementById("level-num").innerText = idx + 1;
-    const levelData = LEVELS[idx];
-    const tileSize = 60;
-
-    for (let row = 0; row < levelData.length; row++) {
-        for (let col = 0; col < levelData[row].length; col++) {
-            let char = levelData[row][col];
-            let x = col * tileSize;
-            // تم ضبط معادلة الارتفاع لتتناسب مع أبعاد الـ Canvas (600px) ولتظهر الأرض في الأسفل
-            let y = row * tileSize; 
-
-            if (char === 'B' || char === 'C') {
-                platforms.push(new Platform(x, y, tileSize, tileSize, char));
-            } else if (char === 'E') {
-                endGate = new Platform(x, y - tileSize, tileSize, tileSize * 2, 'E');
-            } else if (char === 'P') {
-                player = new Player(x, y);
-            }
-        }
-    }
-    cameraX = 0;
-}
-
-// التحكم
-const keys = {};
-window.addEventListener("keydown", e => {
-    keys[e.code] = true;
-    if (e.code === "Space" || e.code === "ArrowUp") player.jump();
-});
-window.addEventListener("keyup", e => keys[e.code] = false);
-
-function gameLoop() {
-    // حركة اللاعب
-    player.velX = 0;
-    if (keys["ArrowRight"] || keys["KeyD"]) player.velX = 4;
-    if (keys["ArrowLeft"] || keys["KeyA"]) player.velX = -4;
-
-    player.update(platforms);
-
-    // تحريك الكاميرا مع اللاعب عند منتصف الشاشة
-    if (player.x - cameraX > canvas.width / 2) {
-        cameraX = player.x - canvas.width / 2;
-    }
-    if (player.x - cameraX < canvas.width / 4 && cameraX > 0) {
-        cameraX = player.x - canvas.width / 4;
-    }
-
-    // الفوز بالمرحلة
-    if (endGate && player.x < endGate.x + endGate.width && player.x + player.width > endGate.x &&
-        player.y < endGate.y + endGate.height && player.y + player.height > endGate.y) {
-        alert("مبروك! لقد فزت بالمرحلة!");
-        loadLevel(currentLevelIdx);
-    }
-
-    // السقوط في الحفرة = إعادة تشغيل المرحلة فوراً
-    if (player.y > canvas.height) {
-        loadLevel(currentLevelIdx);
-    }
-
-    // مسح ورسم الإطارات الجديدة
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // رسم الأرض والمربعات والعلم
-    platforms.forEach(p => p.draw());
-    if (endGate) endGate.draw();
-
-    // رسم صورة الشخصية الخاصة بك
-    ctx.drawImage(playerImage, player.x - cameraX, player.y, player.width, player.height);
-    
-    requestAnimationFrame(gameLoop);
-}
-
-// تشغيل اللعبة
-loadLevel(currentLevelIdx);
-gameLoop();
-</script>
-
-</body>
-</html>
+    const attackImage = new Image();
+    attackImage.src = 'data:image/png;base64,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
