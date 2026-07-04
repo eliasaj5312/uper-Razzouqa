@@ -803,8 +803,631 @@ function gameLoop() {
             en.alive = false;
             player.velY = -10;
         } else {
-            // الاصطدام بعدو = إعادة تشغيل المرحلة
-            loadLevel(currentLevelIdx);
+           
+	// الاصطدام بعدو = إعادة تشغيل المرحلة
+         <!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سوبر رزوقه - خسارة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #gameOverContainer {
+            position: relative;
+            width: 960px;
+            height: 640px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.9);
+            border: 3px solid rgba(255, 0, 0, 0.2);
+        }
+
+        /* ===== الخلفية ===== */
+        #gameOverBackground {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1a0a0a 0%, #2d0a0a 30%, #3a0a0a 60%, #5c1414 100%);
+            overflow: hidden;
+        }
+
+        /* النجوم الحمراء */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .star {
+            position: absolute;
+            background: rgba(255, 100, 100, 0.6);
+            border-radius: 50%;
+            animation: twinkleRed 2s ease-in-out infinite alternate;
+        }
+        @keyframes twinkleRed {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(139, 0, 0, 0.1);
+            border-radius: 100px;
+            animation: floatCloud 25s linear infinite;
+            backdrop-filter: blur(2px);
+        }
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 100px;
+        }
+        @keyframes floatCloud {
+            0% { transform: translateX(-250px); }
+            100% { transform: translateX(1200px); }
+        }
+
+        /* ===== المربع المركزي ===== */
+        #gameOverBox {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .gameover-card {
+            background: linear-gradient(145deg, rgba(30, 0, 0, 0.95), rgba(50, 0, 0, 0.9));
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px 60px 45px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid rgba(255, 50, 50, 0.3);
+            box-shadow: 
+                0 0 60px rgba(255, 0, 0, 0.1),
+                inset 0 0 60px rgba(255, 0, 0, 0.05);
+            animation: cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes cardAppear {
+            0% { opacity: 0; transform: scale(0.8) rotate(-5deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        /* تأثير الخلفية المتوهجة */
+        .gameover-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 0, 0, 0.05), transparent 70%);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* ===== الأيقونة ===== */
+        .gameover-icon {
+            font-size: 80px;
+            margin-bottom: 10px;
+            display: block;
+            animation: iconFloat 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        /* ===== العنوان ===== */
+        .gameover-title {
+            font-size: 48px;
+            font-weight: 900;
+            color: #ff3333;
+            text-shadow: 
+                0 0 30px rgba(255, 0, 0, 0.5),
+                0 4px 20px rgba(0, 0, 0, 0.5);
+            margin: 5px 0;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 2px;
+        }
+
+        /* ===== النص الفرعي ===== */
+        .gameover-subtitle {
+            font-size: 18px;
+            color: #ff9999;
+            margin: 8px 0 20px;
+            position: relative;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        /* ===== إحصائيات ===== */
+        .gameover-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0 30px;
+            position: relative;
+            z-index: 1;
+        }
+        .gameover-stats .stat {
+            text-align: center;
+        }
+        .gameover-stats .stat .label {
+            font-size: 13px;
+            color: #ff6666;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .gameover-stats .stat .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-top: 2px;
+        }
+
+        /* ===== الأزرار ===== */
+        .gameover-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            font-family: inherit;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* زر إعادة المحاولة */
+        .btn-retry {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            box-shadow: 0 6px 25px rgba(255, 0, 0, 0.3);
+        }
+        .btn-retry:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 35px rgba(255, 0, 0, 0.5);
+        }
+
+        /* زر الخروج */
+        .btn-exit {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ff9999;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-exit:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== الزينة ===== */
+        .mushroom-deco {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.1;
+            animation: floatMushroom 5s ease-in-out infinite;
+        }
+        @keyframes floatMushroom {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* ===== شريط التقدم المكسور ===== */
+        .broken-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .broken-bar .fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6b6b, #ff0000);
+            background-size: 200% 100%;
+            animation: brokenProgress 2s linear infinite;
+        }
+        @keyframes brokenProgress {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        /* ===== تصميم متجاوب ===== */
+        @media (max-width: 980px) {
+            #gameOverContainer {
+                width: 95%;
+                height: 95vh;
+                max-height: 640px;
+                border-radius: 16px;
+            }
+            .gameover-card {
+                padding: 35px 30px 30px;
+                max-width: 420px;
+            }
+            .gameover-title {
+                font-size: 36px;
+            }
+            .gameover-icon {
+                font-size: 60px;
+            }
+            .gameover-stats .stat .value {
+                font-size: 22px;
+            }
+            .btn {
+                font-size: 17px;
+                padding: 12px 24px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .gameover-card {
+                padding: 25px 20px 20px;
+                max-width: 340px;
+                border-radius: 20px;
+            }
+            .gameover-title {
+                font-size: 28px;
+            }
+            .gameover-icon {
+                font-size: 48px;
+            }
+            .gameover-subtitle {
+                font-size: 15px;
+            }
+            .gameover-stats {
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+            .gameover-stats .stat .value {
+                font-size: 18px;
+            }
+            .btn {
+                font-size: 15px;
+                padding: 10px 18px;
+                gap: 8px;
+            }
+        }
+
+        /* ===== تأثيرات إضافية ===== */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff4444;
+            border-radius: 50%;
+            animation: sparkleAnim 2s ease-in-out infinite;
+        }
+        @keyframes sparkleAnim {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="gameOverContainer">
+        <!-- ===== الخلفية ===== -->
+        <div id="gameOverBackground">
+            <div class="stars" id="starsContainer"></div>
+            
+            <div class="cloud" style="top: 8%; width: 180px; height: 45px; animation-duration: 28s;">
+                <div style="position:absolute; top:-28px; left:18px; width:90px; height:55px; border-radius:50%; background:inherit;"></div>
+                <div style="position:absolute; top:-18px; right:18px; width:70px; height:45px; border-radius:50%; background:inherit;"></div>
+            </div>
+            <div class="cloud" style="top: 20%; width: 140px; height: 35px; animation-duration: 32s; animation-delay: -10s;">
+                <div style="position:absolute; top:-22px; left:14px; width:70px; height:45px; border-radius:50%; background:inherit;"></div>
+                <div style="position:absolute; top:-14px; right:14px; width:55px; height:35px; border-radius:50%; background:inherit;"></div>
+            </div>
+
+            <div class="mushroom-deco" style="bottom: 15px; left: 20px;">💀</div>
+            <div class="mushroom-deco" style="bottom: 15px; right: 20px; animation-delay: 2s;">🔥</div>
+            <div class="mushroom-deco" style="top: 80px; left: 50px; animation-delay: 1.5s; font-size: 25px;">⚡</div>
+            <div class="mushroom-deco" style="top: 80px; right: 50px; animation-delay: 3s; font-size: 25px;">💔</div>
+        </div>
+
+        <!-- ===== المربع المركزي ===== -->
+        <div id="gameOverBox">
+            <div class="gameover-card">
+                <!-- شريط التقدم المكسور -->
+                <div class="broken-bar">
+                    <div class="fill"></div>
+                </div>
+
+                <!-- الأيقونة -->
+                <span class="gameover-icon">💀</span>
+
+                <!-- العنوان -->
+                <h1 class="gameover-title">خسارة!</h1>
+                <p class="gameover-subtitle">للأسف لم تتمكن من إكمال المستوى</p>
+
+                <!-- الإحصائيات -->
+                <div class="gameover-stats">
+                    <div class="stat">
+                        <div class="label">المستوى</div>
+                        <div class="value" id="levelDisplay">1</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">النقاط</div>
+                        <div class="value" id="scoreDisplay">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="label">المحاولات</div>
+                        <div class="value" id="attemptsDisplay">1</div>
+                    </div>
+                </div>
+
+                <!-- الأزرار -->
+                <div class="gameover-buttons">
+                    <button class="btn btn-retry" id="retryButton">
+                        🔄 إعادة المحاولة
+                    </button>
+                    <button class="btn btn-exit" id="exitButton">
+                        🏠 العودة للمراحل
+                    </button>
+                </div>
+
+                <!-- نص إضافي -->
+                <div style="margin-top: 15px; font-size: 13px; color: rgba(255,255,255,0.2); position: relative; z-index: 1;">
+                    "الفشل هو بداية النجاح"
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  إنشاء النجوم الحمراء
+        // ============================================================
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            const numStars = 80;
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 70 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                container.appendChild(star);
+            }
+        }
+
+        // ============================================================
+        //  بيانات اللعبة (مثال)
+        // ============================================================
+        let gameData = {
+            level: 1,
+            score: 0,
+            attempts: 1
+        };
+
+        // ============================================================
+        //  تحديث الواجهة
+        // ============================================================
+        function updateUI() {
+            document.getElementById('levelDisplay').textContent = gameData.level;
+            document.getElementById('scoreDisplay').textContent = gameData.score;
+            document.getElementById('attemptsDisplay').textContent = gameData.attempts;
+        }
+
+        // ============================================================
+        //  جلب البيانات من localStorage (إذا كانت موجودة)
+        // ============================================================
+        function loadGameData() {
+            const saved = localStorage.getItem('gameOverData');
+            if (saved) {
+                try {
+                    gameData = JSON.parse(saved);
+                } catch(e) {
+                    // استخدام البيانات الافتراضية
+                }
+            }
+            updateUI();
+        }
+
+        // ============================================================
+        //  حفظ البيانات
+        // ============================================================
+        function saveGameData() {
+            localStorage.setItem('gameOverData', JSON.stringify(gameData));
+        }
+
+        // ============================================================
+        //  أزرار التحكم
+        // ============================================================
+        document.getElementById('retryButton').addEventListener('click', function() {
+            // زيادة عدد المحاولات
+            gameData.attempts++;
+            saveGameData();
+            
+            // تأثير عند الضغط
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+            
+            // محاكاة إعادة المحاولة
+            console.log('🔄 إعادة المحاولة...');
+            
+            // إظهار إشعار
+            showToast('🔄 جاري إعادة المحاولة...', '#ff6b6b');
+            
+            // هنا يمكن إعادة تشغيل المستوى
+            // window.location.reload();
+        });
+
+        document.getElementById('exitButton').addEventListener('click', function() {
+            // تأثير عند الضغط
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+            
+            // العودة إلى قائمة المراحل
+            console.log('🏠 العودة إلى قائمة المراحل...');
+            
+            // إظهار إشعار
+            showToast('🏠 جاري العودة...', '#ffd700');
+            
+            // هنا يمكن التوجيه إلى قائمة المراحل
+            // window.location.href = 'levels.html';
+        });
+
+        // ============================================================
+        //  نظام الإشعارات (Toast)
+        // ============================================================
+        function showToast(message, color = '#ff6b6b') {
+            // إزالة أي إشعارات سابقة
+            document.querySelectorAll('.toast').forEach(el => el.remove());
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 14px 30px;
+                border-radius: 16px;
+                font-size: 18px;
+                z-index: 1000;
+                border: 2px solid ${color};
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                animation: toastAnim 0.5s ease;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                text-align: center;
+                max-width: 90%;
+                backdrop-filter: blur(10px);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // اختفاء بعد 2.5 ثانية
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 2500);
+        }
+
+        // إضافة style لإشعارات الـ Toast
+        const toastStyle = document.createElement('style');
+        toastStyle.textContent = `
+            @keyframes toastAnim {
+                0% { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.9); }
+                100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            }
+        `;
+        document.head.appendChild(toastStyle);
+
+        // ============================================================
+        //  اختصارات لوحة المفاتيح
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                document.getElementById('retryButton').click();
+            }
+            if (e.key === 'e' || e.key === 'E') {
+                document.getElementById('exitButton').click();
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('exitButton').click();
+            }
+        });
+
+        // ============================================================
+        //  محاكاة بيانات عشوائية عند التحميل (للعرض)
+        // ============================================================
+        function randomGameData() {
+            const levels = [1, 2, 3, 4, 5];
+            gameData.level = levels[Math.floor(Math.random() * levels.length)];
+            gameData.score = Math.floor(Math.random() * 500) + 50;
+            gameData.attempts = Math.floor(Math.random() * 3) + 1;
+            updateUI();
+        }
+
+        // ============================================================
+        //  بدء التشغيل
+        // ============================================================
+        createStars();
+        
+        // تحميل البيانات أو استخدام بيانات عشوائية
+        const saved = localStorage.getItem('gameOverData');
+        if (saved) {
+            loadGameData();
+        } else {
+            randomGameData();
+            saveGameData();
+        }
+
+        console.log('💀 قائمة الخسارة - سوبر رزوقه');
+        console.log('📊 المستوى: ' + gameData.level);
+        console.log('⭐ النقاط: ' + gameData.score);
+        console.log('🔄 المحاولات: ' + gameData.attempts);
+        console.log('💡 اضغط R لإعادة المحاولة');
+        console.log('💡 اضغط E أو ESC للخروج');
+    </script>
+
+
+		loadLevel(currentLevelIdx);
         }
     }
 
