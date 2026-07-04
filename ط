@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة سوبر رزوقه</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* ============================================
+           حاوية القائمة الرئيسية
+           ============================================ */
+        #menuContainer {
+            position: relative;
+            width: 900px;
+            height: 600px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ============================================
+           الخلفية المتحركة
+           ============================================ */
+        #menuBackground {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, #5c94fc, #1a3b7a);
+            overflow: hidden;
+        }
+
+        /* النجوم المتحركة */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* الغيوم المتحركة */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 100px;
+            animation: floatCloud 20s linear infinite;
+        }
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 100px;
+        }
+        @keyframes floatCloud {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(1100px); }
+        }
+
+        /* ============================================
+           محتوى القائمة
+           ============================================ */
+        #menuContent {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        /* الشعار */
+        .game-title {
+            font-size: 80px;
+            font-weight: 900;
+            color: #ffcc00;
+            text-shadow: 
+                4px 4px 0 #7a4a12,
+                8px 8px 0 rgba(0, 0, 0, 0.3),
+                0 0 40px rgba(255, 204, 0, 0.3);
+            letter-spacing: 6px;
+            margin-bottom: 5px;
+            animation: titleBounce 3s ease-in-out infinite;
+            position: relative;
+        }
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+        }
+
+        /* الأيقونة الصغيرة */
+        .title-icon {
+            font-size: 60px;
+            display: inline-block;
+            animation: spinIcon 8s linear infinite;
+        }
+        @keyframes spinIcon {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* النص الفرعي */
+        .subtitle {
+            font-size: 26px;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 10px 40px;
+            border-radius: 50px;
+            margin: 8px 0 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+        .subtitle span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* مربع التحكمات */
+        .controls-box {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            padding: 18px 35px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 10px 0 30px 0;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .controls-box p {
+            font-size: 17px;
+            color: #d0e0ff;
+            line-height: 2.2;
+            margin: 0;
+        }
+        .controls-box kbd {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-family: inherit;
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .controls-box .warning {
+            color: #ffb3b3;
+            font-size: 15px;
+        }
+        .controls-box .warning kbd {
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+
+        /* زر البداية */
+        #startButton {
+            font-family: inherit;
+            font-size: 30px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #e8302a, #cc2222);
+            border: none;
+            border-radius: 20px;
+            padding: 18px 60px;
+            cursor: pointer;
+            box-shadow: 
+                0 8px 0 #7a1a17,
+                0 8px 30px rgba(232, 48, 42, 0.4);
+            transition: all 0.15s ease;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        #startButton::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #startButton:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 0 #7a1a17, 0 12px 40px rgba(232, 48, 42, 0.5);
+        }
+        #startButton:hover::before {
+            opacity: 1;
+        }
+        #startButton:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #7a1a17;
+        }
+
+        /* ============================================
+           زينة إضافية
+           ============================================ */
+        /* الفطر الصغير في الزوايا */
+        .mushroom-deco {
+            position: absolute;
+            font-size: 50px;
+            opacity: 0.3;
+            animation: floatMushroom 4s ease-in-out infinite;
+        }
+        @keyframes floatMushroom {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        .mushroom-deco:nth-child(1) { bottom: 20px; left: 30px; animation-delay: 0s; }
+        .mushroom-deco:nth-child(2) { bottom: 20px; right: 30px; animation-delay: 1s; }
+        .mushroom-deco:nth-child(3) { top: 20px; left: 30px; animation-delay: 2s; font-size: 35px; }
+        .mushroom-deco:nth-child(4) { top: 20px; right: 30px; animation-delay: 3s; font-size: 35px; }
+
+        /* الأمواج السفلية */
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100% 100% 0 0 / 30% 30% 0 0;
+            animation: waveMove 8s linear infinite;
+        }
+        .wave:nth-child(2) {
+            bottom: -10px;
+            opacity: 0.5;
+            animation-duration: 6s;
+            animation-delay: -2s;
+            height: 40px;
+        }
+        @keyframes waveMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ============================================
+           تأثير التحميل للزر
+           ============================================ */
+        .btn-pulse {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 8px 0 #7a1a17, 0 8px 30px rgba(232, 48, 42, 0.4); }
+            50% { box-shadow: 0 8px 0 #7a1a17, 0 8px 50px rgba(232, 48, 42, 0.8); }
+        }
+
+        /* ============================================
+           تصميم متجاوب
+           ============================================ */
+        @media (max-width: 920px) {
+            #menuContainer {
+                width: 95%;
+                height: 95vh;
+                max-height: 600px;
+                border-radius: 16px;
+            }
+            .game-title {
+                font-size: 48px;
+                letter-spacing: 3px;
+            }
+            .title-icon {
+                font-size: 40px;
+            }
+            .subtitle {
+                font-size: 20px;
+                padding: 8px 24px;
+            }
+            .controls-box {
+                padding: 14px 20px;
+                max-width: 90%;
+            }
+            .controls-box p {
+                font-size: 14px;
+                line-height: 2;
+            }
+            .controls-box kbd {
+                padding: 2px 12px;
+                font-size: 13px;
+            }
+            #startButton {
+                font-size: 24px;
+                padding: 14px 40px;
+            }
+            .mushroom-deco {
+                display: none;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .game-title {
+                font-size: 32px;
+                letter-spacing: 2px;
+            }
+            .title-icon {
+                font-size: 28px;
+            }
+            .subtitle {
+                font-size: 16px;
+                padding: 6px 16px;
+            }
+            .controls-box p {
+                font-size: 12px;
+                line-height: 1.8;
+            }
+            .controls-box kbd {
+                padding: 2px 8px;
+                font-size: 11px;
+            }
+            #startButton {
+                font-size: 18px;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menuContainer">
+        <!-- ===== الخلفية ===== -->
+        <div id="menuBackground">
+            <!-- النجوم -->
+            <div class="stars" id="starsContainer"></div>
+            
+            <!-- الغيوم -->
+            <div class="cloud" style="top: 10%; width: 200px; height: 50px; animation-duration: 25s;">
+                <div style="position:absolute; top:-30px; left:20px; width:100px; height:60px; border-radius:50%; background:inherit;"></div>
+                <div style="position:absolute; top:-20px; right:20px; width:80px; height:50px; border-radius:50%; background:inherit;"></div>
+            </div>
+            <div class="cloud" style="top: 25%; width: 150px; height: 40px; animation-duration: 30s; animation-delay: -8s;">
+                <div style="position:absolute; top:-25px; left:15px; width:80px; height:50px; border-radius:50%; background:inherit;"></div>
+                <div style="position:absolute; top:-15px; right:15px; width:60px; height:40px; border-radius:50%; background:inherit;"></div>
+            </div>
+            <div class="cloud" style="top: 5%; width: 180px; height: 45px; animation-duration: 22s; animation-delay: -15s;">
+                <div style="position:absolute; top:-28px; left:18px; width:90px; height:55px; border-radius:50%; background:inherit;"></div>
+                <div style="position:absolute; top:-18px; right:18px; width:70px; height:45px; border-radius:50%; background:inherit;"></div>
+            </div>
+
+            <!-- الأمواج -->
+            <div class="wave"></div>
+            <div class="wave"></div>
+
+            <!-- زينة الفطر -->
+            <div class="mushroom-deco">🍄</div>
+            <div class="mushroom-deco">🍄</div>
+            <div class="mushroom-deco">⭐</div>
+            <div class="mushroom-deco">⭐</div>
+        </div>
+
+        <!-- ===== المحتوى ===== -->
+        <div id="menuContent">
+            <!-- الشعار -->
+            <h1 class="game-title">
+                <span class="title-icon">🍄</span> سوبر رزوقه
+            </h1>
+
+            <!-- النص الفرعي -->
+            <div class="subtitle">
+                ⚡ <span>المغامرة</span> تبدأ الآن ⚡
+            </div>
+
+            <!-- مربع التحكمات -->
+            <div class="controls-box">
+                <p>
+                    <kbd>←</kbd> <kbd>→</kbd> أو <kbd>A</kbd> <kbd>D</kbd> للحركة &nbsp;|&nbsp;
+                    <kbd>Space</kbd> أو <kbd>↑</kbd> للقفز &nbsp;|&nbsp;
+                    <kbd>X</kbd> للضربة
+                </p>
+                <p class="warning">
+                    ⚠️ اقفز على الأعداء أو اضربهم بـ <kbd>X</kbd> — احذر الشوكي!
+                </p>
+            </div>
+
+            <!-- زر البداية -->
+            <button id="startButton" class="btn-pulse">
+                ▶ ابدأ اللعبة
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  إنشاء النجوم
+        // ============================================================
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            const numStars = 80;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 4 + 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 70 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                container.appendChild(star);
+            }
+        }
+
+        // ============================================================
+        //  تأثيرات الزر
+        // ============================================================
+        document.getElementById('startButton').addEventListener('click', function() {
+            // تأثير عند الضغط
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+            
+            // هنا يمكنك إضافة كود بدء اللعبة
+            console.log('🚀 بدء اللعبة...');
+            // window.location.href = 'game.html'; // لتوجيه إلى صفحة اللعبة
+        });
+
+        // ============================================================
+        //  تشغيل المؤثرات
+        // ============================================================
+        createStars();
+
+        // تغيير لون النص الفرعي بشكل عشوائي
+        const subtitle = document.querySelector('.subtitle span');
+        const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#ffa502'];
+        setInterval(() => {
+            subtitle.style.color = colors[Math.floor(Math.random() * colors.length)];
+        }, 2000);
+
+        console.log('🎮 قائمة سوبر رزوقه جاهزة!');
+    </script>
+
+</body>
+</html>
