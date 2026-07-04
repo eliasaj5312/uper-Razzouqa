@@ -465,7 +465,682 @@
 
         console.log('🎮 قائمة سوبر رزوقه جاهزة!');
     </script>
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سوبر رزوقه - اختيار المراحل</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* ============================================
+           حاوية القائمة الرئيسية
+           ============================================ */
+        #menuContainer {
+            position: relative;
+            width: 960px;
+            height: 640px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.9);
+            border: 3px solid rgba(255, 215, 0, 0.2);
+        }
+
+        /* ============================================
+           الخلفية المتحركة
+           ============================================ */
+        #menuBackground {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1a1a3e 0%, #2d1b69 30%, #1a3b7a 60%, #5c94fc 100%);
+            overflow: hidden;
+        }
+
+        /* النجوم */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* الغيوم */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            animation: floatCloud 25s linear infinite;
+            backdrop-filter: blur(2px);
+        }
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 100px;
+        }
+        @keyframes floatCloud {
+            0% { transform: translateX(-250px); }
+            100% { transform: translateX(1200px); }
+        }
+
+        /* ============================================
+           الهيدر
+           ============================================ */
+        #header {
+            position: relative;
+            z-index: 10;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(255, 215, 0, 0.2);
+        }
+        #header .title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 2px 20px rgba(255, 215, 0, 0.3);
+        }
+        #header .title span {
+            color: #ff6b6b;
+        }
+        #header .stats {
+            display: flex;
+            gap: 25px;
+            color: white;
+            font-size: 16px;
+        }
+        #header .stats div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #header .stats .icon {
+            font-size: 20px;
+        }
+
+        /* زر العودة */
+        #backButton {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        #backButton:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* ============================================
+           شبكة المراحل
+           ============================================ */
+        #levelsGrid {
+            position: relative;
+            z-index: 10;
+            padding: 25px 30px 30px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            height: calc(100% - 80px);
+            align-content: start;
+            overflow-y: auto;
+        }
+        #levelsGrid::-webkit-scrollbar {
+            width: 6px;
+        }
+        #levelsGrid::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        #levelsGrid::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        /* ============================================
+           بطاقة المرحلة
+           ============================================ */
+        .level-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+            border-radius: 16px;
+            padding: 18px 12px 14px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            backdrop-filter: blur(4px);
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .level-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            border-color: rgba(255, 215, 0, 0.4);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        .level-card:active {
+            transform: scale(0.95);
+        }
+
+        .level-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.6);
+        }
+        .level-card.locked:hover {
+            transform: none;
+            border-color: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* رقم المستوى */
+        .level-number {
+            font-size: 38px;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 2px 20px rgba(255, 215, 0, 0.2);
+            line-height: 1;
+        }
+
+        /* أيقونة المستوى */
+        .level-icon {
+            font-size: 40px;
+            margin: 4px 0;
+        }
+
+        /* اسم المستوى */
+        .level-name {
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 4px;
+            opacity: 0.9;
+        }
+
+        /* حالة المستوى */
+        .level-status {
+            font-size: 12px;
+            margin-top: 6px;
+            padding: 3px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .level-status.completed {
+            color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.15);
+        }
+        .level-status.locked-status {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        .level-status.current {
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+            animation: pulseCurrent 2s ease-in-out infinite;
+        }
+        @keyframes pulseCurrent {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* نجوم التقييم */
+        .level-stars {
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+        .level-stars .star-filled {
+            color: #ffd700;
+        }
+        .level-stars .star-empty {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* قفل المستوى */
+        .lock-icon {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 18px;
+            opacity: 0.6;
+        }
+
+        /* ============================================
+           ألوان خاصة بكل مستوى
+           ============================================ */
+        .level-card[data-level="1"] .level-number { color: #ff6b6b; }
+        .level-card[data-level="2"] .level-number { color: #ffa502; }
+        .level-card[data-level="3"] .level-number { color: #ffd700; }
+        .level-card[data-level="4"] .level-number { color: #4ecdc4; }
+        .level-card[data-level="5"] .level-number { color: #45b7d1; }
+        .level-card[data-level="6"] .level-number { color: #a29bfe; }
+        .level-card[data-level="7"] .level-number { color: #fd79a8; }
+        .level-card[data-level="8"] .level-number { color: #fdcb6e; }
+        .level-card[data-level="9"] .level-number { color: #00b894; }
+        .level-card[data-level="10"] .level-number { color: #e17055; }
+
+        /* ============================================
+           رسوم متحركة إضافية
+           ============================================ */
+        .mushroom-deco {
+            position: absolute;
+            font-size: 40px;
+            opacity: 0.15;
+            animation: floatMushroom 5s ease-in-out infinite;
+        }
+        @keyframes floatMushroom {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* ============================================
+           تصميم متجاوب
+           ============================================ */
+        @media (max-width: 980px) {
+            #menuContainer {
+                width: 95%;
+                height: 95vh;
+                max-height: 640px;
+                border-radius: 16px;
+            }
+            #levelsGrid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 14px;
+                padding: 18px;
+            }
+            .level-card {
+                min-height: 120px;
+                padding: 14px 10px;
+            }
+            .level-number { font-size: 30px; }
+            .level-icon { font-size: 32px; }
+            #header .title { font-size: 22px; }
+        }
+
+        @media (max-width: 700px) {
+            #levelsGrid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                padding: 14px;
+            }
+            .level-card {
+                min-height: 100px;
+                padding: 12px 8px;
+            }
+            .level-number { font-size: 26px; }
+            .level-icon { font-size: 28px; }
+            .level-name { font-size: 11px; }
+            #header .title { font-size: 18px; }
+            #header .stats { font-size: 13px; gap: 12px; }
+            #header { padding: 12px 16px; }
+        }
+
+        @media (max-width: 500px) {
+            #levelsGrid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 10px;
+            }
+            .level-card {
+                min-height: 85px;
+                padding: 10px 6px;
+                border-radius: 12px;
+            }
+            .level-number { font-size: 22px; }
+            .level-icon { font-size: 22px; }
+            .level-name { font-size: 10px; }
+            .level-status { font-size: 10px; padding: 2px 8px; }
+            #header .title { font-size: 15px; }
+            #header .stats { font-size: 11px; gap: 8px; }
+            .lock-icon { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menuContainer">
+        <!-- ===== الخلفية ===== -->
+        <div id="menuBackground">
+            <div class="stars" id="starsContainer"></div>
+            
+            <div class="cloud" style="top: 8%; width: 180px; height: 45px; animation-duration: 28s;">
+                <div style="position:absolute; top:-28px; left:18px; width:90px; height:55px; border-radius:50%; background:inherit;"></div>
+                <div style="position:absolute; top:-18px; right:18px; width:70px; height:45px; border-radius:50%; background:inherit;"></div>
+            </div>
+            <div class="cloud" style="top: 20%; width: 140px; height: 35px; animation-duration: 32s; animation-delay: -10s;">
+                <div style="position:absolute; top:-22px; left:14px; width:70px; height:45px; border-radius:50%; background:inherit;"></div>
+                <div style="position:absolute; top:-14px; right:14px; width:55px; height:35px; border-radius:50%; background:inherit;"></div>
+            </div>
+
+            <div class="mushroom-deco" style="bottom: 15px; left: 20px;">🍄</div>
+            <div class="mushroom-deco" style="bottom: 15px; right: 20px; animation-delay: 2s;">⭐</div>
+            <div class="mushroom-deco" style="top: 80px; left: 50px; animation-delay: 1.5s; font-size: 25px;">🌟</div>
+            <div class="mushroom-deco" style="top: 80px; right: 50px; animation-delay: 3s; font-size: 25px;">🌙</div>
+        </div>
+
+        <!-- ===== الهيدر ===== -->
+        <div id="header">
+            <div class="title">
+                🍄 سوبر <span>رزوقه</span>
+            </div>
+            <div class="stats">
+                <div>
+                    <span class="icon">⭐</span>
+                    <span id="totalScore">0</span>
+                </div>
+                <div>
+                    <span class="icon">🪙</span>
+                    <span id="totalCoins">0</span>
+                </div>
+                <div>
+                    <span class="icon">🏆</span>
+                    <span id="completedLevels">0</span>/10
+                </div>
+                <button id="backButton">🏠 العودة</button>
+            </div>
+        </div>
+
+        <!-- ===== شبكة المراحل ===== -->
+        <div id="levelsGrid"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  بيانات المراحل
+        // ============================================================
+        const levelsData = [
+            { id: 1, name: 'الغابة الخضراء', icon: '🌳', difficulty: '⭐', stars: 3 },
+            { id: 2, name: 'وادي النار', icon: '🔥', difficulty: '⭐⭐', stars: 2 },
+            { id: 3, name: 'الجليد الأزرق', icon: '❄️', difficulty: '⭐⭐', stars: 1 },
+            { id: 4, name: 'قلعة الظلام', icon: '🏰', difficulty: '⭐⭐⭐', stars: 0 },
+            { id: 5, name: 'صحراء الذهب', icon: '🏜️', difficulty: '⭐⭐⭐', stars: 0 },
+            { id: 6, name: 'غابة العمالقة', icon: '🌿', difficulty: '⭐⭐⭐', stars: 0 },
+            { id: 7, name: 'كهف الأسرار', icon: '🕳️', difficulty: '⭐⭐⭐⭐', stars: 0 },
+            { id: 8, name: 'جبل النار', icon: '🌋', difficulty: '⭐⭐⭐⭐', stars: 0 },
+            { id: 9, name: 'مدينة الغيوم', icon: '☁️', difficulty: '⭐⭐⭐⭐⭐', stars: 0 },
+            { id: 10, name: 'قصر النهاية', icon: '👑', difficulty: '⭐⭐⭐⭐⭐', stars: 0 }
+        ];
+
+        // ============================================================
+        //  بيانات اللاعب (محفوظة في localStorage)
+        // ============================================================
+        function getPlayerData() {
+            const data = localStorage.getItem('superRazzouqaData');
+            if (data) {
+                return JSON.parse(data);
+            }
+            // بيانات افتراضية
+            return {
+                currentLevel: 1,
+                completed: {},
+                totalScore: 0,
+                totalCoins: 0
+            };
+        }
+
+        function savePlayerData(data) {
+            localStorage.setItem('superRazzouqaData', JSON.stringify(data));
+        }
+
+        // ============================================================
+        //  إنشاء النجوم
+        // ============================================================
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            const numStars = 100;
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 3 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 70 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                container.appendChild(star);
+            }
+        }
+
+        // ============================================================
+        //  عرض المراحل
+        // ============================================================
+        function renderLevels() {
+            const grid = document.getElementById('levelsGrid');
+            const playerData = getPlayerData();
+            grid.innerHTML = '';
+
+            levelsData.forEach((level, index) => {
+                const levelNum = level.id;
+                const isCompleted = playerData.completed[levelNum] || false;
+                const isLocked = levelNum > playerData.currentLevel;
+                const isCurrent = levelNum === playerData.currentLevel && !isCompleted;
+                const stars = playerData.completed[levelNum] || 0;
+
+                const card = document.createElement('div');
+                card.className = `level-card${isLocked ? ' locked' : ''}`;
+                card.setAttribute('data-level', levelNum);
+
+                // محتوى البطاقة
+                card.innerHTML = `
+                    ${isLocked ? '<div class="lock-icon">🔒</div>' : ''}
+                    <div class="level-number">${String(levelNum).padStart(2, '0')}</div>
+                    <div class="level-icon">${level.icon}</div>
+                    <div class="level-name">${level.name}</div>
+                    <div class="level-stars">
+                        ${getStarsHTML(stars)}
+                    </div>
+                    <div class="level-status ${isCompleted ? 'completed' : isLocked ? 'locked-status' : 'current'}">
+                        ${isCompleted ? '✅ مكتمل' : isLocked ? '🔒 مغلق' : '▶️ الحالي'}
+                    </div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.3); margin-top:4px;">
+                        ${level.difficulty}
+                    </div>
+                `;
+
+                // حدث النقر
+                if (!isLocked) {
+                    card.addEventListener('click', () => {
+                        playLevel(levelNum);
+                    });
+                }
+
+                grid.appendChild(card);
+            });
+
+            // تحديث الإحصائيات
+            updateStats(playerData);
+        }
+
+        // ============================================================
+        //  عرض النجوم
+        // ============================================================
+        function getStarsHTML(count) {
+            let html = '';
+            for (let i = 1; i <= 3; i++) {
+                html += `<span class="${i <= count ? 'star-filled' : 'star-empty'}">★</span>`;
+            }
+            return html;
+        }
+
+        // ============================================================
+        //  تحديث الإحصائيات
+        // ============================================================
+        function updateStats(playerData) {
+            const completed = Object.keys(playerData.completed).filter(
+                key => playerData.completed[key] === true
+            ).length;
+            
+            document.getElementById('totalScore').textContent = playerData.totalScore || 0;
+            document.getElementById('totalCoins').textContent = playerData.totalCoins || 0;
+            document.getElementById('completedLevels').textContent = completed;
+        }
+
+        // ============================================================
+        //  تشغيل المستوى
+        // ============================================================
+        function playLevel(levelNum) {
+            console.log(`🎮 تشغيل المستوى ${levelNum}: ${levelsData[levelNum-1].name}`);
+            
+            // محاكاة إنهاء المستوى (للتجربة)
+            // في اللعبة الحقيقية، سيتم تشغيل المستوى هنا
+            
+            // محاكاة: بعد 2 ثانية نعتبر المستوى مكتمل
+            // هذا فقط للعرض، في اللعبة الحقيقية يتم إكمال المستوى عند الفوز
+            
+            // نعرض رسالة
+            const card = document.querySelector(`.level-card[data-level="${levelNum}"]`);
+            if (card) {
+                card.style.borderColor = '#4ecdc4';
+                card.style.boxShadow = '0 0 30px rgba(78, 205, 196, 0.3)';
+                setTimeout(() => {
+                    card.style.borderColor = '';
+                    card.style.boxShadow = '';
+                }, 1500);
+            }
+            
+            // تنبيه
+            const levelName = levelsData[levelNum-1].name;
+            alert(`🕹️ جارٍ تشغيل المستوى ${levelNum}\n📌 ${levelName}\n\n💡 سيتم إضافة نظام اللعبة هنا!`);
+        }
+
+        // ============================================================
+        //  إكمال المستوى (محاكاة)
+        // ============================================================
+        function completeLevel(levelNum, stars = 3) {
+            const playerData = getPlayerData();
+            
+            // تأكد أن المستوى غير مكتمل مسبقاً
+            if (!playerData.completed[levelNum]) {
+                playerData.completed[levelNum] = stars;
+                playerData.totalScore += stars * 100;
+                playerData.totalCoins += stars * 5;
+                
+                // فتح المستوى التالي
+                if (levelNum === playerData.currentLevel) {
+                    playerData.currentLevel = Math.min(levelNum + 1, 10);
+                }
+                
+                savePlayerData(playerData);
+                renderLevels();
+            }
+        }
+
+        // ============================================================
+        //  زر العودة
+        // ============================================================
+        document.getElementById('backButton').addEventListener('click', () => {
+            if (confirm('هل تريد العودة إلى القائمة الرئيسية؟')) {
+                // هنا يمكن توجيه إلى القائمة الرئيسية
+                alert('🏠 جارٍ العودة إلى القائمة الرئيسية...');
+                // window.location.href = 'index.html';
+            }
+        });
+
+        // ============================================================
+        //  إضافة مستمع لأزرار لوحة المفاتيح (اختصارات)
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            // Escape للعودة
+            if (e.key === 'Escape') {
+                document.getElementById('backButton').click();
+            }
+            // أرقام 1-10 لتشغيل المستويات
+            const num = parseInt(e.key);
+            if (num >= 1 && num <= 10) {
+                const playerData = getPlayerData();
+                if (num <= playerData.currentLevel) {
+                    playLevel(num);
+                }
+            }
+        });
+
+        // ============================================================
+        //  إعادة تعيين التقدم (للاختبار)
+        // ============================================================
+        function resetProgress() {
+            if (confirm('⚠️ هل تريد إعادة تعيين كل التقدم؟')) {
+                localStorage.removeItem('superRazzouqaData');
+                renderLevels();
+                alert('✅ تم إعادة تعيين التقدم!');
+            }
+        }
+
+        // اختصار لإعادة التعيين (اضغط R 3 مرات)
+        let resetCount = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                resetCount++;
+                if (resetCount >= 3) {
+                    resetProgress();
+                    resetCount = 0;
+                }
+                setTimeout(() => resetCount = 0, 3000);
+            }
+        });
+
+        // ============================================================
+        //  بدء التشغيل
+        // ============================================================
+        createStars();
+        renderLevels();
+
+        console.log('🎮 قائمة المراحل - سوبر رزوقه');
+        console.log('📊 عدد المراحل: 10');
+        console.log('💡 اضغط 1-10 لتشغيل المستوى مباشرة');
+        console.log('💡 اضغط R 3 مرات لإعادة تعيين التقدم');
+        console.log('💡 اضغط ESC للعودة');
+
+        // تصدير الدوال للاختبار في الكونسول
+        window.completeLevel = completeLevel;
+        window.resetProgress = resetProgress;
+        window.getPlayerData = getPlayerData;
+        window.levelsData = levelsData;
+    </script>
+
+</body>
+</html>
 </body>
 </html>
 
