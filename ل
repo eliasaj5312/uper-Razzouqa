@@ -1,0 +1,76 @@
+// ... داخل دالة gameLoop، ابحث عن الجزء الذي يرسم اللاعب واستبدله بالتالي:
+
+const cx = player.x - cameraX + player.width / 2;
+const cy = player.y + player.height / 2 - bob;
+
+ctx.save();
+ctx.translate(cx, cy);
+ctx.rotate(tilt);
+ctx.scale(player.facing * squashX, squashY); // الحفاظ على تأثيرات الحركة والانعكاس
+
+// إعدادات رسم البيكسل آرت
+const pSize = 4; // حجم البكسل الواحد (يمكنك تغييره لتكبير أو تصغير الشخصية)
+const startX = -player.width / 2;
+const startY = -player.height / 2;
+
+// دالة مساعدة لرسم بكسل واحد
+function drawPixel(x, y, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(startX + x * pSize, startY + y * pSize, pSize, pSize);
+}
+
+// --- رسم الشخصية (بناءً على الصورة) ---
+
+// 1. الشعر (أسود)
+drawPixel(5, 0, "#000"); drawPixel(6, 0, "#000"); drawPixel(7, 0, "#000"); drawPixel(8, 0, "#000"); drawPixel(9, 0, "#000");
+drawPixel(4, 1, "#000"); drawPixel(5, 1, "#000"); drawPixel(6, 1, "#000"); drawPixel(7, 1, "#000"); drawPixel(8, 1, "#000"); drawPixel(9, 1, "#000"); drawPixel(10, 1, "#000");
+drawPixel(4, 2, "#000"); drawPixel(5, 2, "#000"); drawPixel(6, 2, "#000"); drawPixel(7, 2, "#000"); drawPixel(8, 2, "#000"); drawPixel(9, 2, "#000"); drawPixel(10, 2, "#000");
+
+// 2. الوجه (بني فاتح)
+drawPixel(5, 3, "#dca57a"); drawPixel(6, 3, "#dca57a"); drawPixel(7, 3, "#dca57a"); drawPixel(8, 3, "#dca57a"); drawPixel(9, 3, "#dca57a");
+drawPixel(4, 4, "#dca57a"); drawPixel(5, 4, "#dca57a"); drawPixel(6, 4, "#dca57a"); drawPixel(7, 4, "#dca57a"); drawPixel(8, 4, "#dca57a"); drawPixel(9, 4, "#dca57a"); drawPixel(10, 4, "#dca57a");
+drawPixel(4, 5, "#dca57a"); drawPixel(5, 5, "#dca57a"); drawPixel(6, 5, "#dca57a"); drawPixel(7, 5, "#dca57a"); drawPixel(8, 5, "#dca57a"); drawPixel(9, 5, "#dca57a"); drawPixel(10, 5, "#dca57a");
+drawPixel(5, 6, "#dca57a"); drawPixel(6, 6, "#dca57a"); drawPixel(7, 6, "#dca57a"); drawPixel(8, 6, "#dca57a"); drawPixel(9, 6, "#dca57a");
+
+// 3. العينين (أبيض وأسود)
+drawPixel(5, 4, "#fff"); drawPixel(6, 4, "#000"); // عين يسرى
+drawPixel(8, 4, "#fff"); drawPixel(9, 4, "#000"); // عين يمنى
+
+// 4. الفم والأنف
+drawPixel(7, 5, "#b07d55"); // أنف
+drawPixel(6, 7, "#5c3a21"); drawPixel(7, 7, "#5c3a21"); drawPixel(8, 7, "#5c3a21"); // فم
+
+// 5. الرقبة (بني غامق)
+drawPixel(6, 8, "#b07d55"); drawPixel(7, 8, "#b07d55"); drawPixel(8, 8, "#b07d55");
+
+// 6. القميص الداخلي (أسود وأحمر)
+drawPixel(4, 9, "#111"); drawPixel(5, 9, "#111"); drawPixel(6, 9, "#111"); drawPixel(7, 9, "#111"); drawPixel(8, 9, "#111"); drawPixel(9, 9, "#111"); drawPixel(10, 9, "#111");
+drawPixel(4, 10, "#111"); drawPixel(5, 10, "#e60000"); drawPixel(6, 10, "#e60000"); drawPixel(7, 10, "#e60000"); drawPixel(8, 10, "#e60000"); drawPixel(9, 10, "#e60000"); drawPixel(10, 10, "#111"); // أحمر
+drawPixel(4, 11, "#111"); drawPixel(5, 11, "#e60000"); drawPixel(6, 11, "#fff"); drawPixel(7, 11, "#fff"); drawPixel(8, 11, "#e60000"); drawPixel(9, 11, "#e60000"); drawPixel(10, 11, "#111"); // خطوط بيضاء
+
+// 7. الجاكيت الكاموفلاج (أخضر وبني) - الأكتاف
+drawPixel(0, 9, "#5c7a29"); drawPixel(1, 9, "#8c6e3d"); drawPixel(2, 9, "#5c7a29"); drawPixel(3, 9, "#8c6e3d"); // كتف يسار
+drawPixel(11, 9, "#5c7a29"); drawPixel(12, 9, "#8c6e3d"); drawPixel(13, 9, "#5c7a29"); drawPixel(14, 9, "#8c6e3d"); // كتف يمين
+
+drawPixel(0, 10, "#8c6e3d"); drawPixel(1, 10, "#5c7a29"); drawPixel(2, 10, "#8c6e3d"); drawPixel(3, 10, "#5c7a29"); 
+drawPixel(11, 10, "#8c6e3d"); drawPixel(12, 10, "#5c7a29"); drawPixel(13, 10, "#8c6e3d"); drawPixel(14, 10, "#5c7a29");
+
+drawPixel(0, 11, "#5c7a29"); drawPixel(1, 11, "#8c6e3d"); drawPixel(2, 11, "#5c7a29"); drawPixel(3, 11, "#8c6e3d");
+drawPixel(11, 11, "#5c7a29"); drawPixel(12, 11, "#8c6e3d"); drawPixel(13, 11, "#5c7a29"); drawPixel(14, 11, "#8c6e3d");
+
+// 8. اليد والسلسلة (اليد مرفوعة)
+// السلسلة (فضي)
+drawPixel(5, 9, "#ccc"); drawPixel(6, 10, "#ccc"); drawPixel(7, 11, "#ccc"); drawPixel(8, 12, "#ccc"); 
+
+// اليد (بني)
+drawPixel(3, 8, "#dca57a"); drawPixel(4, 7, "#dca57a"); drawPixel(5, 6, "#dca57a"); // الأصابع
+drawPixel(2, 9, "#dca57a"); drawPixel(3, 9, "#dca57a"); drawPixel(4, 8, "#dca57a"); drawPixel(5, 7, "#dca57a"); // راحة اليد
+
+// الخاتم (أسود)
+drawPixel(4, 7, "#000"); 
+
+// كم الجاكيت لليد
+drawPixel(1, 10, "#5c7a29"); drawPixel(2, 11, "#8c6e3d"); 
+
+ctx.restore();
+// ... باقي الكود
