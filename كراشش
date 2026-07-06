@@ -4,16 +4,65 @@
     <title>تأثير المطر الرقمي - Matrix</title>
     <style>
         * { margin: 0; padding: 0; }
-        body { background: #000; overflow: hidden; }
+        body { 
+            background: #000; 
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
         canvas { display: block; }
+        
+        /* تنسيق النص */
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff41;
+            font-size: 80px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41, 0 0 80px #00ff41;
+            z-index: 10;
+            pointer-events: none;
+            animation: glow 2s ease-in-out infinite alternate;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        /* تأثير الوميض */
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41, 0 0 80px #00ff41; }
+            to { text-shadow: 0 0 30px #00ff41, 0 0 60px #00ff41, 0 0 120px #00ff41, 0 0 200px #00ff41; }
+        }
     </style>
 </head>
 <body>
+    <!-- النص في وسط الشاشة -->
+    <div class="message">تم الاختراق عن طريق الياس عجينه</div>
+    
     <canvas id="canvas"></canvas>
     
-    <script src="https://cdn.jsdelivr.net/npm/dat.gui@0.7.9/build/dat.gui.min.js"></script>
     <script>
-        
+        // إعدادات الحالة
+        const state = {
+            fps: 60,
+            color: "#00ff41",
+            charset: "0123456789ABCDEF",
+            size: 14
+        };
+
+        // إعدادات الرسم
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let w, h, p;
+
+        // دالة تغيير الحجم
+        const resize = () => {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            p = Array(Math.ceil(w / state.size)).fill(0);
+        };
+
+        // دالة الرسم (تأثير المطر الرقمي)
+        const draw = () => {
             // طبقة شفافة لتأثير التلاشي
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, w, h);
@@ -38,7 +87,6 @@
 
         // مراقبة تغيير الحجم
         window.addEventListener("resize", resize);
-        sizeCtrl.onFinishChange((s) => resize());
         resize();
 
         // تشغيل الحركة
