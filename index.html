@@ -802,7 +802,7 @@ class Enemy {
             if (attackImage.complete && attackImage.naturalWidth !== 0) {
                 ctx.drawImage(getMaskedImage(attackImage, this.width, this.height + 10), dx, this.y - 10);
             } else {
-                ctx.fillStyle = "#8e44ad";
+                ctx.fillStyle = "#7a4a2a";
                 ctx.fillRect(dx, this.y, this.width, this.height);
             }
 
@@ -818,7 +818,7 @@ class Enemy {
                 ctx.fill();
             }
 
-     } else if (this.type === 'S') {
+       } else if (this.type === 'S') {
     // عدو شوكي ثابت (خطر دائم حتى من فوق)
 
     // --- 1. تجهيز الصورة (ننشئ العنصر مرة واحدة داخل الـ if، أو الأفضل نعرفه فوق في بداية الملف) ---
